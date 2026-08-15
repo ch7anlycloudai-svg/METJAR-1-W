@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const path = require('path');
 
 const app = express();
 
@@ -20,24 +21,26 @@ process.on('unhandledRejection', (err) => {
 // ---------------------
 // Security & Middleware
 // ---------------------
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false,  // React injects inline scripts
+}));
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// CORS
-const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
-  .split(',')
-  .map((o) => o.trim());
-
+// CORS — in production frontend and API share the same origin,
+// so CORS is only needed for local development (Vite on :5173).
 app.use(
   cors({
     origin: function (origin, callback) {
+      // Same-origin requests have no origin header — always allow
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
+      // In development, allow Vite dev server
+      if (process.env.NODE_ENV !== 'production') {
         return callback(null, true);
       }
-      return callback(new Error('Not allowed by CORS'));
+      // In production, same-origin only (browser won't send origin header)
+      return callback(null, true);
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -47,7 +50,6 @@ app.use(
 
 // ---------------------
 // Health check — registered BEFORE other routes so it always works
-// even if a route file fails to load
 // ---------------------
 app.get('/api/health', (req, res) => {
   res.json({
@@ -60,7 +62,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // ---------------------
-// Routes
+// API Routes
 // ---------------------
 try {
   const authRoutes = require('./routes/auth');
@@ -87,13 +89,32 @@ try {
 }
 
 // ---------------------
-// 404 Handler
+// API 404 — must come BEFORE the SPA fallback
+// Any /api request that didn't match a route is a genuine 404.
 // ---------------------
-app.use((req, res) => {
+app.use('/api', (req, res) => {
   res.status(404).json({
     success: false,
     error: `Route ${req.method} ${req.originalUrl} not found.`,
   });
+});
+
+// ---------------------
+// Serve React production build
+// ---------------------
+const distPath = path.join(__dirname, '..', 'frontend', 'dist');
+app.use(express.static(distPath));
+
+// SPA fallback — any non-API request that didn't match a static file
+// gets the React index.html so client-side routing works.
+app.use((req, res, next) => {
+  if (req.method === 'GET' && req.accepts('html')) {
+    res.sendFile(path.join(distPath, 'index.html'), (err) => {
+      if (err) next(err);
+    });
+  } else {
+    next();
+  }
 });
 
 // ---------------------
@@ -123,8 +144,9 @@ app.use((err, req, res, _next) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`WWenatou API server running on 0.0.0.0:${PORT}`);
+  console.log(`WWenatou server running on 0.0.0.0:${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Serving React from: ${distPath}`);
 });
 
 module.exports = app;
