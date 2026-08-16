@@ -54,9 +54,11 @@ app.use(
 app.get('/api/health', (req, res) => {
   try {
     const fs = require('fs');
-    const distPath = path.join(__dirname, '..', 'frontend', 'dist');
-    const distExists = fs.existsSync(distPath);
-    const indexExists = distExists && fs.existsSync(path.join(distPath, 'index.html'));
+    const healthDistPath = fs.existsSync(path.join(__dirname, 'public'))
+      ? path.join(__dirname, 'public')
+      : path.join(__dirname, '..', 'frontend', 'dist');
+    const distExists = fs.existsSync(healthDistPath);
+    const indexExists = distExists && fs.existsSync(path.join(healthDistPath, 'index.html'));
     const supabase = require('./config/supabase');
 
     // Test DB asynchronously but always respond
@@ -131,8 +133,13 @@ app.use('/api', (req, res) => {
 
 // ---------------------
 // Serve React production build
+// Production: frontend is pre-built into backend/public
+// Development: falls back to ../frontend/dist
 // ---------------------
-const distPath = path.join(__dirname, '..', 'frontend', 'dist');
+const fs = require('fs');
+const prodDist = path.join(__dirname, 'public');
+const devDist = path.join(__dirname, '..', 'frontend', 'dist');
+const distPath = fs.existsSync(prodDist) ? prodDist : devDist;
 app.use(express.static(distPath));
 
 // SPA fallback — any non-API request that didn't match a static file
