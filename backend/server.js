@@ -51,40 +51,44 @@ app.use(
 // ---------------------
 // Health check — registered BEFORE other routes so it always works
 // ---------------------
-app.get('/api/health', async (req, res) => {
-  const path = require('path');
-  const fs = require('fs');
-  const distPath = path.join(__dirname, '..', 'frontend', 'dist');
-  const distExists = fs.existsSync(distPath);
-  const indexExists = distExists && fs.existsSync(path.join(distPath, 'index.html'));
-
-  // Quick Supabase connectivity test
-  let dbStatus = 'not tested';
+app.get('/api/health', (req, res) => {
   try {
+    const fs = require('fs');
+    const distPath = path.join(__dirname, '..', 'frontend', 'dist');
+    const distExists = fs.existsSync(distPath);
+    const indexExists = distExists && fs.existsSync(path.join(distPath, 'index.html'));
     const supabase = require('./config/supabase');
+
+    // Test DB asynchronously but always respond
+    const info = {
+      success: true,
+      message: 'WWenatou API is running.',
+      timestamp: new Date().toISOString(),
+      env: process.env.NODE_ENV || 'development',
+      supabase_url: !!process.env.SUPABASE_URL,
+      supabase_key: !!(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY),
+      supabase_client: !!supabase,
+      dist: distExists,
+      index_html: indexExists,
+      cwd: process.cwd(),
+      dirname: __dirname,
+    };
+
     if (supabase) {
-      const { data, error } = await supabase.from('categories').select('id').limit(1);
-      dbStatus = error ? `error: ${error.message}` : `ok (${(data || []).length} rows)`;
+      supabase.from('categories').select('id').limit(1).then(({ data, error }) => {
+        info.db = error ? 'error: ' + error.message : 'ok (' + (data || []).length + ' rows)';
+        res.json(info);
+      }).catch((e) => {
+        info.db = 'exception: ' + e.message;
+        res.json(info);
+      });
     } else {
-      dbStatus = 'client is null (missing env vars)';
+      info.db = 'no client';
+      res.json(info);
     }
   } catch (e) {
-    dbStatus = `exception: ${e.message}`;
+    res.json({ success: false, error: e.message, stack: e.stack });
   }
-
-  res.json({
-    success: true,
-    message: 'WWenatou API is running.',
-    timestamp: new Date().toISOString(),
-    env: process.env.NODE_ENV || 'development',
-    supabase_url: !!process.env.SUPABASE_URL,
-    supabase_key: !!(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY),
-    db: dbStatus,
-    dist: distExists,
-    index_html: indexExists,
-    cwd: process.cwd(),
-    dirname: __dirname,
-  });
 });
 
 // ---------------------
