@@ -51,13 +51,39 @@ app.use(
 // ---------------------
 // Health check — registered BEFORE other routes so it always works
 // ---------------------
-app.get('/api/health', (req, res) => {
+app.get('/api/health', async (req, res) => {
+  const path = require('path');
+  const fs = require('fs');
+  const distPath = path.join(__dirname, '..', 'frontend', 'dist');
+  const distExists = fs.existsSync(distPath);
+  const indexExists = distExists && fs.existsSync(path.join(distPath, 'index.html'));
+
+  // Quick Supabase connectivity test
+  let dbStatus = 'not tested';
+  try {
+    const supabase = require('./config/supabase');
+    if (supabase) {
+      const { data, error } = await supabase.from('categories').select('id').limit(1);
+      dbStatus = error ? `error: ${error.message}` : `ok (${(data || []).length} rows)`;
+    } else {
+      dbStatus = 'client is null (missing env vars)';
+    }
+  } catch (e) {
+    dbStatus = `exception: ${e.message}`;
+  }
+
   res.json({
     success: true,
     message: 'WWenatou API is running.',
     timestamp: new Date().toISOString(),
     env: process.env.NODE_ENV || 'development',
-    supabase: !!process.env.SUPABASE_URL,
+    supabase_url: !!process.env.SUPABASE_URL,
+    supabase_key: !!(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY),
+    db: dbStatus,
+    dist: distExists,
+    index_html: indexExists,
+    cwd: process.cwd(),
+    dirname: __dirname,
   });
 });
 
