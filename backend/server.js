@@ -51,6 +51,23 @@ app.use(
 // ---------------------
 // Health check — registered BEFORE other routes so it always works
 // ---------------------
+// Temporary debug endpoint — remove after fixing auth
+app.get('/api/debug-auth', (req, res) => {
+  const supabase = require('./config/supabase');
+  if (!supabase) return res.json({ error: 'no supabase client' });
+  supabase.from('admin_users').select('id, email, password_hash').eq('email', 'admin@wwenatou.com').single()
+    .then(({ data, error }) => {
+      if (error) return res.json({ error: error.message, code: error.code, hint: error.hint });
+      res.json({
+        found: !!data,
+        email: data?.email,
+        hash_prefix: data?.password_hash?.substring(0, 10),
+        hash_length: data?.password_hash?.length,
+      });
+    })
+    .catch(e => res.json({ exception: e.message }));
+});
+
 app.get('/api/health', (req, res) => {
   try {
     const fs = require('fs');
