@@ -1,1 +1,0 @@
-import{f as e,p as t}from"./index-Cea5vjac.js";var n=t()(e(e=>({token:null,admin:null,isAuthenticated:!1,login:(t,n)=>{localStorage.setItem(`admin_token`,t),e({token:t,admin:n,isAuthenticated:!0})},logout:()=>{localStorage.removeItem(`admin_token`),e({token:null,admin:null,isAuthenticated:!1})}}),{name:`wwenatou-auth`}));export{n as t};

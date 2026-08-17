@@ -50,83 +50,12 @@ app.use(
 
 // ---------------------
 // Health check — registered BEFORE other routes so it always works
-// ---------------------
-// Temporary endpoint — resets admin password then removes itself
-app.get('/api/reset-admin', async (req, res) => {
-  try {
-    const bcrypt = require('bcryptjs');
-    const supabase = require('./config/supabase');
-    if (!supabase) return res.json({ error: 'no supabase client' });
-
-    const newHash = await bcrypt.hash('Admin@2026', 10);
-
-    // Try update first
-    const { data: updated, error: updateErr } = await supabase
-      .from('admin_users')
-      .update({ password_hash: newHash })
-      .eq('email', 'admin@wwenatou.com')
-      .select('id, email')
-      .single();
-
-    if (updateErr) {
-      // If update fails, try delete + insert
-      await supabase.from('admin_users').delete().eq('email', 'admin@wwenatou.com');
-      const { data: inserted, error: insertErr } = await supabase
-        .from('admin_users')
-        .insert({ email: 'admin@wwenatou.com', password_hash: newHash, name: 'Administrator', role: 'admin' })
-        .select('id, email')
-        .single();
-
-      if (insertErr) return res.json({ error: insertErr.message, hint: insertErr.hint });
-      return res.json({ success: true, method: 'delete+insert', email: inserted.email, hash_prefix: newHash.substring(0, 10) });
-    }
-
-    res.json({ success: true, method: 'update', email: updated.email, hash_prefix: newHash.substring(0, 10) });
-  } catch (e) {
-    res.json({ error: e.message });
-  }
-});
-
 app.get('/api/health', (req, res) => {
-  try {
-    const fs = require('fs');
-    const healthDistPath = fs.existsSync(path.join(__dirname, 'public'))
-      ? path.join(__dirname, 'public')
-      : path.join(__dirname, '..', 'frontend', 'dist');
-    const distExists = fs.existsSync(healthDistPath);
-    const indexExists = distExists && fs.existsSync(path.join(healthDistPath, 'index.html'));
-    const supabase = require('./config/supabase');
-
-    // Test DB asynchronously but always respond
-    const info = {
-      success: true,
-      message: 'WWenatou API is running.',
-      timestamp: new Date().toISOString(),
-      env: process.env.NODE_ENV || 'development',
-      supabase_url: !!process.env.SUPABASE_URL,
-      supabase_key: !!(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY),
-      supabase_client: !!supabase,
-      dist: distExists,
-      index_html: indexExists,
-      cwd: process.cwd(),
-      dirname: __dirname,
-    };
-
-    if (supabase) {
-      supabase.from('categories').select('id').limit(1).then(({ data, error }) => {
-        info.db = error ? 'error: ' + error.message : 'ok (' + (data || []).length + ' rows)';
-        res.json(info);
-      }).catch((e) => {
-        info.db = 'exception: ' + e.message;
-        res.json(info);
-      });
-    } else {
-      info.db = 'no client';
-      res.json(info);
-    }
-  } catch (e) {
-    res.json({ success: false, error: e.message, stack: e.stack });
-  }
+  res.json({
+    success: true,
+    message: 'WWenatou API is running.',
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // ---------------------

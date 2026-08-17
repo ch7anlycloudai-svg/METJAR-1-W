@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../store/authStore';
 import { api } from '../../services/api';
-import toast from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import { FiMail, FiLock, FiLogIn } from 'react-icons/fi';
 
 const AdminLogin: React.FC = () => {
@@ -40,6 +40,7 @@ const AdminLogin: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+      <Toaster position="top-center" />
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <div className="text-center mb-8">

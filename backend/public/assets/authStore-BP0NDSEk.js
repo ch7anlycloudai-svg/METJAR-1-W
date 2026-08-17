@@ -1,0 +1,1 @@
+import{m as e,p as t}from"./index-CFKMMTFt.js";var n=e()(t(e=>({token:null,admin:null,isAuthenticated:!1,login:(t,n)=>{localStorage.setItem(`admin_token`,t),e({token:t,admin:n,isAuthenticated:!0})},logout:()=>{localStorage.removeItem(`admin_token`),e({token:null,admin:null,isAuthenticated:!1})}}),{name:`wwenatou-auth`}));export{n as t};
