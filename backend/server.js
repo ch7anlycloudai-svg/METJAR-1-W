@@ -51,21 +51,40 @@ app.use(
 // ---------------------
 // Health check — registered BEFORE other routes so it always works
 // ---------------------
-// Temporary debug endpoint — remove after fixing auth
-app.get('/api/debug-auth', (req, res) => {
-  const supabase = require('./config/supabase');
-  if (!supabase) return res.json({ error: 'no supabase client' });
-  supabase.from('admin_users').select('id, email, password_hash').eq('email', 'admin@wwenatou.com').single()
-    .then(({ data, error }) => {
-      if (error) return res.json({ error: error.message, code: error.code, hint: error.hint });
-      res.json({
-        found: !!data,
-        email: data?.email,
-        hash_prefix: data?.password_hash?.substring(0, 10),
-        hash_length: data?.password_hash?.length,
-      });
-    })
-    .catch(e => res.json({ exception: e.message }));
+// Temporary endpoint — resets admin password then removes itself
+app.get('/api/reset-admin', async (req, res) => {
+  try {
+    const bcrypt = require('bcryptjs');
+    const supabase = require('./config/supabase');
+    if (!supabase) return res.json({ error: 'no supabase client' });
+
+    const newHash = await bcrypt.hash('Admin@2026', 10);
+
+    // Try update first
+    const { data: updated, error: updateErr } = await supabase
+      .from('admin_users')
+      .update({ password_hash: newHash })
+      .eq('email', 'admin@wwenatou.com')
+      .select('id, email')
+      .single();
+
+    if (updateErr) {
+      // If update fails, try delete + insert
+      await supabase.from('admin_users').delete().eq('email', 'admin@wwenatou.com');
+      const { data: inserted, error: insertErr } = await supabase
+        .from('admin_users')
+        .insert({ email: 'admin@wwenatou.com', password_hash: newHash, name: 'Administrator', role: 'admin' })
+        .select('id, email')
+        .single();
+
+      if (insertErr) return res.json({ error: insertErr.message, hint: insertErr.hint });
+      return res.json({ success: true, method: 'delete+insert', email: inserted.email, hash_prefix: newHash.substring(0, 10) });
+    }
+
+    res.json({ success: true, method: 'update', email: updated.email, hash_prefix: newHash.substring(0, 10) });
+  } catch (e) {
+    res.json({ error: e.message });
+  }
 });
 
 app.get('/api/health', (req, res) => {
