@@ -50,19 +50,6 @@ app.use(
 
 // ---------------------
 // Health check — registered BEFORE other routes so it always works
-// Temporary: bulk add image URLs to products
-app.post('/api/seed-images', async (req, res) => {
-  try {
-    const supabase = require('./config/supabase');
-    if (!supabase) return res.json({ error: 'no client' });
-    const { images } = req.body; // [{product_id, url, alt, sort_order}]
-    if (!images || !images.length) return res.json({ error: 'no images' });
-    const { data, error } = await supabase.from('product_images').insert(images).select('id');
-    if (error) return res.json({ error: error.message });
-    res.json({ success: true, count: data.length });
-  } catch (e) { res.json({ error: e.message }); }
-});
-
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
