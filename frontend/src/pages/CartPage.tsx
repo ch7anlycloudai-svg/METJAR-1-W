@@ -34,7 +34,7 @@ export default function CartPage() {
     setCouponError('');
     try {
       const res = await api.validateCoupon(couponCode.trim(), subtotal);
-      setCoupon(res?.data || res?.coupon || res);
+      setCoupon(res?.coupon || null);
     } catch {
       setCouponError(t.invalidCoupon);
       setCoupon(null);

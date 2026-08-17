@@ -41,7 +41,7 @@ const CouponsList: React.FC = () => {
   const loadCoupons = async () => {
     try {
       const res = await api.getCoupons();
-      setCoupons(res.coupons || res || []);
+      setCoupons(res.coupons || []);
     } catch {
       toast.error('Failed to load coupons');
     } finally {

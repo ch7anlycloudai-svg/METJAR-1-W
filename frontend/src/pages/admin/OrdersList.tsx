@@ -40,7 +40,7 @@ const OrdersList: React.FC = () => {
   const loadOrders = async () => {
     try {
       const res = await api.getOrders();
-      setOrders(res.orders || res || []);
+      setOrders(res.orders || []);
     } catch {
       toast.error('Failed to load orders');
     } finally {

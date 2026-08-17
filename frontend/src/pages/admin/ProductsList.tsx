@@ -19,7 +19,7 @@ const ProductsList: React.FC = () => {
   const loadProducts = async () => {
     try {
       const res = await api.getProducts();
-      setProducts(res.products || res || []);
+      setProducts(res.products || []);
     } catch (err: any) {
       toast.error('Failed to load products');
     } finally {

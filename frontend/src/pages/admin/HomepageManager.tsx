@@ -45,7 +45,7 @@ const HomepageManager: React.FC = () => {
   const loadSections = async () => {
     try {
       const res = await api.getHomepageSections();
-      const data: HomepageSection[] = res.sections || res || [];
+      const data: HomepageSection[] = res.sections || [];
       setSections(data);
 
       const ids: Record<string, string> = {};

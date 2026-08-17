@@ -54,7 +54,7 @@ export default function ProductsPage() {
 
   useEffect(() => {
     api.getCategories()
-      .then((res) => setCategories(res?.data || res || []))
+      .then((res) => setCategories(res?.categories || []))
       .catch(() => {});
   }, []);
 
@@ -71,7 +71,7 @@ export default function ProductsPage() {
       if (selectedColors.length) params.colors = selectedColors.join(',');
 
       const res = await api.getProducts(params);
-      setProducts(res?.data || res?.products || res || []);
+      setProducts(res?.products || []);
     } catch {
       setProducts([]);
     } finally {

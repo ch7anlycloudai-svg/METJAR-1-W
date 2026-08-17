@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-vite@latest frontend --template react-ts --)",
+      "Bash(npm install:*)",
+      "Bash(node -e \":*)",
+      "Bash(cd:*)",
+      "Bash(find '/c/Users/PC/Documents/METJAR 1 W/frontend/src/pages' -name *.tsx)",
+      "Bash(find '/c/Users/PC/Documents/METJAR 1 W/frontend/src/components' -name *.tsx)",
+      "Bash(find '/c/Users/PC/Documents/METJAR 1 W/frontend/src' -name *.tsx -o -name *.ts)",
+      "Bash(find '/c/Users/PC/Documents/METJAR 1 W/frontend/src' -name *.tsx)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)",
+      "Bash(find '/c/Users/PC/Documents/METJAR 1 W' -type f \\\\\\(-name *.ts -o -name *.tsx -o -name *.js -o -name *.sql -o -name *.css -o -name *.html \\\\\\) -not -path */node_modules/* -not -path */dist/*)",
+      "Bash(node -c server.js)",
+      "Bash(for f:*)",
+      "Bash(do node:*)",
+      "Bash(echo \"$f OK\")",
+      "Bash(done)",
+      "Bash(grep -rn require.*supabase '/c/Users/PC/Documents/METJAR 1 W/backend/routes/' '/c/Users/PC/Documents/METJAR 1 W/backend/controllers/')",
+      "Bash(node -e \"const express = require\\(''express''\\); console.log\\(''Express version:'', require\\(''express/package.json''\\).version\\)\")",
+      "Bash(echo \"FAIL: $f\")",
+      "Bash(PORT=4999 SUPABASE_URL=https://test.supabase.co SUPABASE_SERVICE_ROLE_KEY=test-key JWT_SECRET=test-secret timeout 5 node server.js)",
+      "Bash(echo \"EXIT CODE: $?\")",
+      "Bash(PORT=4998 JWT_SECRET=test-secret SUPABASE_URL=\"\" SUPABASE_SERVICE_ROLE_KEY=\"\" timeout 5 node -e \":*)",
+      "Bash(node -c config/supabase.js)",
+      "Bash(PORT=4996 SUPABASE_URL=https://test.supabase.co SUPABASE_SECRET_KEY=test-secret-key JWT_SECRET=test-jwt timeout 4 node server.js)",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(npm uninstall:*)",
+      "Bash(node:*)",
+      "Bash(timeout 5 npm start)",
+      "WebFetch(domain:olivedrab-turtle-691679.hostingersite.com)",
+      "Bash(cp:*)",
+      "Bash(curl -s -X POST https://olivedrab-turtle-691679.hostingersite.com/api/auth/login -H \"Content-Type: application/json\" -d '{\"\"\"\"email\"\"\"\":\"\"\"\"admin@wwenatou.com\"\"\"\",\"\"\"\"password\"\"\"\":\"\"\"\"Admin@2026\"\"\"\"}')"
+    ]
+  }
+}

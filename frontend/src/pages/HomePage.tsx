@@ -73,11 +73,11 @@ export default function HomePage() {
           api.getProducts({ featured: 'true', limit: '8' }),
           api.getProducts({ sale: 'true', limit: '8' }),
         ]);
-        if (sectionsRes.status === 'fulfilled') setSections(sectionsRes.value?.data || sectionsRes.value || []);
-        if (catsRes.status === 'fulfilled') setCategories(catsRes.value?.data || catsRes.value || []);
-        if (newRes.status === 'fulfilled') setNewArrivals(newRes.value?.data || newRes.value?.products || []);
-        if (featRes.status === 'fulfilled') setFeatured(featRes.value?.data || featRes.value?.products || []);
-        if (saleRes.status === 'fulfilled') setSaleProducts(saleRes.value?.data || saleRes.value?.products || []);
+        if (sectionsRes.status === 'fulfilled') setSections(sectionsRes.value?.sections || []);
+        if (catsRes.status === 'fulfilled') setCategories(catsRes.value?.categories || []);
+        if (newRes.status === 'fulfilled') setNewArrivals(newRes.value?.products || []);
+        if (featRes.status === 'fulfilled') setFeatured(featRes.value?.products || []);
+        if (saleRes.status === 'fulfilled') setSaleProducts(saleRes.value?.products || []);
       } catch {
         // silently handle
       } finally {

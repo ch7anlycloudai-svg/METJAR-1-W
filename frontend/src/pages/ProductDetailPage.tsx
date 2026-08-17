@@ -54,12 +54,12 @@ export default function ProductDetailPage() {
 
     api.getProduct(id)
       .then((res) => {
-        const p = res?.data || res?.product || res;
+        const p = res?.product || res;
         setProduct(p);
         if (p?.category_id) {
           api.getProducts({ category: p.category?.slug || p.category_id, limit: '4' })
             .then((r) => {
-              const items = (r?.data || r?.products || r || []).filter(
+              const items = (r?.products || []).filter(
                 (rp: Product) => rp.id !== p.id
               );
               setRelatedProducts(items.slice(0, 4));

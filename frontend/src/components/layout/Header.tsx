@@ -27,7 +27,7 @@ export default function Header() {
 
   useEffect(() => {
     api.getCategories()
-      .then((res) => setCategories(res?.data || res || []))
+      .then((res) => setCategories(res?.categories || []))
       .catch(() => {});
   }, []);
 

@@ -29,7 +29,7 @@ const CustomersList: React.FC = () => {
   const loadCustomers = async () => {
     try {
       const res = await api.getCustomers();
-      setCustomers(res.customers || res || []);
+      setCustomers(res.customers || []);
     } catch {
       toast.error('Failed to load customers');
     } finally {

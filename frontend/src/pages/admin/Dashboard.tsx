@@ -34,8 +34,8 @@ const Dashboard: React.FC = () => {
         api.getOrders(),
       ]);
 
-      const products: Product[] = productsRes.products || productsRes || [];
-      const orders: Order[] = ordersRes.orders || ordersRes || [];
+      const products: Product[] = productsRes.products || [];
+      const orders: Order[] = ordersRes.orders || [];
 
       const pendingOrders = orders.filter((o) => o.status === 'pending').length;
       const totalRevenue = orders

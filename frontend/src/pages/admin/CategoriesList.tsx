@@ -38,7 +38,7 @@ const CategoriesList: React.FC = () => {
   const loadCategories = async () => {
     try {
       const res = await api.getCategories();
-      setCategories(res.categories || res || []);
+      setCategories(res.categories || []);
     } catch {
       toast.error('Failed to load categories');
     } finally {

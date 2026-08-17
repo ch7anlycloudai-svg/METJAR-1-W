@@ -386,7 +386,7 @@ CREATE POLICY "Public can create order items"
 -- BCrypt hash generated for 'Admin@2026'
 -- ----------------------------------------------------------------------------
 INSERT INTO admin_users (email, password_hash, name, role) VALUES
-    ('admin@wwenatou.com', '$2a$10$X7UrE3GnM4hJTqFMxqVQYOzN0sWGqU5rJ8KdVcFkenYBpQP2lK7FW', 'Administrator', 'admin');
+    ('admin@wwenatou.com', '$2b$10$IuBiuAHbETxcWu4tQG6c0OVRUySoggCCES3p.IxZ0MgFC49AC0FOC', 'Administrator', 'admin');
 
 -- ----------------------------------------------------------------------------
 -- Store Settings
